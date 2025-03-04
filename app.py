@@ -15,40 +15,104 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS to improve aesthetics
+# Helper function for Plotly dark mode compatibility
+def configure_plotly_for_both_modes(fig):
+    """Configure Plotly figure to be visible in both light and dark mode"""
+    fig.update_layout(
+        # Background colors
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        
+        # Text colors - using a darker color for better visibility in light mode
+        font=dict(
+            color="#333333" 
+        ),
+        
+        # Grid colors that work in both modes
+        xaxis=dict(
+            gridcolor="rgba(80,80,80,0.2)",
+            zerolinecolor="rgba(80,80,80,0.5)"
+        ),
+        yaxis=dict(
+            gridcolor="rgba(80,80,80,0.2)",
+            zerolinecolor="rgba(80,80,80,0.5)"
+        )
+    )
+    
+    return fig
+
+# Custom CSS to improve aesthetics with both light and dark mode support
 st.markdown("""
 <style>
+    /* Headers with colors that work in both light and dark mode */
     .main-header {
         font-size: 2.5rem;
         font-weight: 700;
-        color: #2c3e50;
+        color: #3498db !important; /* Blue that works in both modes */
         margin-bottom: 1rem;
         text-align: center;
     }
     .section-header {
         font-size: 1.8rem;
         font-weight: 600;
-        color: #3498db;
+        color: #3498db !important; /* Blue that works in both modes */
         margin-top: 1.5rem;
         margin-bottom: 1rem;
     }
     .subsection-header {
         font-size: 1.3rem;
         font-weight: 500;
-        color: #34495e;
+        color: #f39c12 !important; /* Orange that works in both modes */
         margin-top: 1rem;
         margin-bottom: 0.5rem;
     }
     .highlight {
-        color: #e74c3c;
+        color: #e74c3c !important;
         font-weight: 600;
     }
     .insight-box {
-        background-color: #f8f9fa;
-        border-left: 4px solid #3498db;
+        background-color: rgba(52, 152, 219, 0.1) !important;
+        border-left: 4px solid #3498db !important;
         padding: 1rem;
         margin-bottom: 1rem;
         border-radius: 0.3rem;
+        color: #333333 !important; /* Dark text color for light mode visibility */
+    }
+    
+    /* Make sure text stays visible */
+    .stMarkdown {
+        color: #333333 !important; /* Darker color for better light mode visibility */
+    }
+    
+    /* Footer styling */
+    .footer {
+        text-align: center;
+        color: #333333 !important; /* Darker color for better light mode visibility */
+    }
+    
+    /* Plotly-specific styles */
+    .js-plotly-plot .plotly .gtitle, 
+    .js-plotly-plot .plotly .xtitle,
+    .js-plotly-plot .plotly .ytitle {
+        fill: #333333 !important; /* Darker color for better light mode visibility */
+    }
+    
+    .js-plotly-plot .plotly .xtick text,
+    .js-plotly-plot .plotly .ytick text {
+        fill: #333333 !important; /* Darker color for better light mode visibility */
+    }
+
+    /* Streamlit caption and text elements */
+    .caption {
+        color: #333333 !important;
+    }
+    
+    p {
+        color: #333333 !important;
+    }
+    
+    li {
+        color: #333333 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -56,10 +120,10 @@ st.markdown("""
 # App title
 st.markdown('<div class="main-header">🚲 Bike Sharing Analysis Dashboard</div>', unsafe_allow_html=True)
 st.markdown("""
-This dashboard analyzes the bike sharing dataset from Capital Bikeshare system in Washington D.C., USA.
+<p style="color: #333333;">This dashboard analyzes the bike sharing dataset from Capital Bikeshare system in Washington D.C., USA.
 The data covers the years 2011 and 2012, and includes information on hourly and daily bike rentals,
-along with weather and seasonal information.
-""")
+along with weather and seasonal information.</p>
+""", unsafe_allow_html=True)
 
 # Data loading function
 @st.cache_data
@@ -193,9 +257,11 @@ with tab1:
             y='cnt',
             color='weathersit_name',
             labels={'weathersit_name': 'Weather Condition', 'cnt': 'Average Rentals'},
-            text_auto='.0f'
+            text_auto='.0f',
+            color_discrete_sequence=px.colors.qualitative.Set1  # Brighter colors
         )
         fig.update_layout(showlegend=False)
+        fig = configure_plotly_for_both_modes(fig)
         st.plotly_chart(fig, use_container_width=True)
         
         st.markdown('<div class="insight-box">Clear weather conditions show significantly higher rental rates compared to rainy or snowy days. Weather has a direct impact on bike rental behavior.</div>', unsafe_allow_html=True)
@@ -228,6 +294,7 @@ with tab1:
             },
             color_discrete_map={'casual': '#e74c3c', 'registered': '#3498db'}
         )
+        fig = configure_plotly_for_both_modes(fig)
         st.plotly_chart(fig, use_container_width=True)
         
         st.markdown('<div class="insight-box">Casual users are more affected by weather conditions, showing a steeper decline in poor weather compared to registered users who maintain more consistent usage patterns.</div>', unsafe_allow_html=True)
@@ -252,6 +319,7 @@ with tab1:
             },
             title='Bike Rentals by Temperature and Weather'
         )
+        fig = configure_plotly_for_both_modes(fig)
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
@@ -279,6 +347,7 @@ with tab1:
             },
             title='Bike Rentals by Temperature and Humidity'
         )
+        fig = configure_plotly_for_both_modes(fig)
         st.plotly_chart(fig, use_container_width=True)
     
     st.markdown('<div class="insight-box">Temperature has a strong positive correlation with bike rentals up to a certain point (around 0.7 normalized temperature), after which extremely high temperatures may reduce rental rates. High humidity combined with high temperatures tends to suppress bike rental activity.</div>', unsafe_allow_html=True)
@@ -324,7 +393,7 @@ with tab2:
     fig.update_traces(
         hovertemplate='Hour: %{x}<br>Average Rentals: %{y:.1f}'
     )
-    
+    fig = configure_plotly_for_both_modes(fig)
     st.plotly_chart(fig, use_container_width=True)
     
     st.markdown('<div class="insight-box">Working days show a characteristic bimodal pattern with peaks during commuting hours (8 AM and 5-6 PM), while weekends and holidays display a more even distribution with a single broad peak in the afternoon. This clearly indicates different use cases: utilitarian commuting on working days versus recreational riding on non-working days.</div>', unsafe_allow_html=True)
@@ -359,7 +428,7 @@ with tab2:
         },
         color_discrete_map={'casual': '#e74c3c', 'registered': '#3498db'}
     )
-    
+    fig = configure_plotly_for_both_modes(fig)
     st.plotly_chart(fig, use_container_width=True)
     
     col1, col2 = st.columns(2)
@@ -377,6 +446,7 @@ with tab2:
             },
             title='Distribution of Bike Rentals by Day Category'
         )
+        fig = configure_plotly_for_both_modes(fig)
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
@@ -422,10 +492,10 @@ with tab2:
             color_discrete_map={'casual': '#e74c3c', 'registered': '#3498db'}
         )
         fig.update_layout(xaxis=dict(tickmode='linear', tick0=0, dtick=1))
-        
+        fig = configure_plotly_for_both_modes(fig)
         st.plotly_chart(fig, use_container_width=True)
     
-    st.markdown('<div class="insight-box">Registered users dominate on working days, particularly during peak commuting hours, while casual users make up a significantly larger proportion of weekend and holiday rentals. On holidays, theres a notable decrease in registered users compared to regular weekends, suggesting many registered commuters may be away or not using the service.</div>', unsafe_allow_html=True)
+    st.markdown('''<div class="insight-box">Registered users dominate on working days, particularly during peak commuting hours, while casual users make up a significantly larger proportion of weekend and holiday rentals. On holidays, there's a notable decrease in registered users compared to regular weekends, suggesting many registered commuters may be away or not using the service.</div>''', unsafe_allow_html=True)
 
 # Tab 3: Combined Analysis
 with tab3:
@@ -451,7 +521,7 @@ with tab3:
         title="Average Rentals by Weather and Day Type",
         color_continuous_scale='viridis'
     )
-    
+    fig = configure_plotly_for_both_modes(fig)
     st.plotly_chart(fig, use_container_width=True)
     
     # Bar chart showing user types by weather and day type
@@ -477,7 +547,7 @@ with tab3:
         text_auto='.0f'
     )
     
-    # Add percentage annotations
+    # Add percentage annotations with color for both light and dark mode
     for i, row in user_weather_day.iterrows():
         fig.add_annotation(
             x=row['weathersit_name'],
@@ -486,9 +556,10 @@ with tab3:
             showarrow=False,
             xanchor='center',
             yanchor='bottom',
-            font=dict(size=10, color="#555")
+            font=dict(size=10, color="#333333")  # Dark color for light mode visibility
         )
     
+    fig = configure_plotly_for_both_modes(fig)
     st.plotly_chart(fig, use_container_width=True)
     
     st.markdown('<div class="insight-box">The combination of weather and day type reveals interesting patterns: clear weather on weekends generates the highest casual ridership, while working days maintain strong registered user activity regardless of weather (except in extreme conditions). This suggests weather has a more pronounced effect on recreational riding compared to commuting.</div>', unsafe_allow_html=True)
@@ -514,7 +585,7 @@ with tab3:
         },
         title="Hierarchical View of Factors Affecting Bike Rentals"
     )
-    
+    fig = configure_plotly_for_both_modes(fig)
     st.plotly_chart(fig, use_container_width=True)
     
     st.markdown('<div class="insight-box">The hierarchical view shows the compounding effects of season, weather, and day type. Summer and fall seasons with clear weather generate the highest rental activity regardless of day type, while winter rentals are more affected by both weather conditions and day type.</div>', unsafe_allow_html=True)
@@ -571,7 +642,7 @@ with tab4:
             labels={x_var: x_var, y_var: y_var, color_var: color_var},
             title=f"{y_var} vs {x_var} by {color_var}"
         )
-        
+        fig = configure_plotly_for_both_modes(fig)
         st.plotly_chart(fig, use_container_width=True)
         
     elif chart_type == "Line Chart":
@@ -605,7 +676,7 @@ with tab4:
             labels={x_var: x_var, y_var: f"Average {y_var}", color_var: color_var},
             title=f"Average {y_var} by {x_var} and {color_var}"
         )
-        
+        fig = configure_plotly_for_both_modes(fig)
         st.plotly_chart(fig, use_container_width=True)
         
     elif chart_type == "Bar Chart":
@@ -643,7 +714,7 @@ with tab4:
                 labels={x_var: x_var, y_var: f"Average {y_var}", color_var: color_var},
                 title=f"Average {y_var} by {x_var} and {color_var}"
             )
-        
+        fig = configure_plotly_for_both_modes(fig)
         st.plotly_chart(fig, use_container_width=True)
         
     elif chart_type == "Box Plot":
@@ -663,7 +734,7 @@ with tab4:
             labels={x_var: x_var, y_var: y_var},
             title=f"Distribution of {y_var} by {x_var}"
         )
-        
+        fig = configure_plotly_for_both_modes(fig)
         st.plotly_chart(fig, use_container_width=True)
         
     elif chart_type == "Heatmap":
@@ -691,7 +762,7 @@ with tab4:
             title=f"Average {value_var} by {x_var} and {y_var}",
             text_auto='.0f'
         )
-        
+        fig = configure_plotly_for_both_modes(fig)
         st.plotly_chart(fig, use_container_width=True)
     
     # Show raw data
@@ -705,7 +776,7 @@ with tab4:
 # Footer
 st.markdown("""---""")
 st.markdown("""
-<div style="text-align: center; color: #666;">
+<div class="footer">
     <p>Bike Sharing Dashboard - Created for Data Analysis Project</p>
     <p>Data source: Capital Bikeshare, Washington D.C. (2011-2012)</p>
 </div>
