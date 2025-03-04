@@ -58,10 +58,6 @@ seaborn>=0.13.0
 plotly>=5.18.0
 ```
 
-## Dashboard Screenshots
-
-![Dashboard Screenshot](https://freeimage.host/i/33G8NmF)
-
 ## Sumber Data
 
 Dataset berasal dari:
