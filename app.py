@@ -44,75 +44,110 @@ def configure_plotly_for_both_modes(fig):
 # Custom CSS to improve aesthetics with both light and dark mode support
 st.markdown("""
 <style>
-    /* Headers with colors that work in both light and dark mode */
+    /* Base styles for all elements */
+    body {
+        transition: all 0.5s ease;
+    }
+    
+    /* Header styles with visible colors in both modes */
     .main-header {
         font-size: 2.5rem;
         font-weight: 700;
-        color: #3498db !important; /* Blue that works in both modes */
+        color: #3498db !important;
         margin-bottom: 1rem;
         text-align: center;
     }
+    
     .section-header {
         font-size: 1.8rem;
         font-weight: 600;
-        color: #3498db !important; /* Blue that works in both modes */
+        color: #3498db !important;
         margin-top: 1.5rem;
         margin-bottom: 1rem;
     }
+    
     .subsection-header {
         font-size: 1.3rem;
         font-weight: 500;
-        color: #f39c12 !important; /* Orange that works in both modes */
+        color: #f39c12 !important;
         margin-top: 1rem;
         margin-bottom: 0.5rem;
     }
-    .highlight {
-        color: #e74c3c !important;
-        font-weight: 600;
-    }
+    
+    /* Base insight box styles */
     .insight-box {
         background-color: rgba(52, 152, 219, 0.1) !important;
         border-left: 4px solid #3498db !important;
         padding: 1rem;
         margin-bottom: 1rem;
         border-radius: 0.3rem;
-        color: #333333 !important; /* Dark text color for light mode visibility */
     }
     
-    /* Make sure text stays visible */
-    .stMarkdown {
-        color: #333333 !important; /* Darker color for better light mode visibility */
+    /* Auto-adapting text color for light/dark modes */
+    /* Streamlit uses the [data-theme] attribute on the main container */
+    
+    /* Light mode styles - dark text */
+    [data-theme="light"] .insight-box,
+    [data-theme="light"] .stMarkdown p,
+    [data-theme="light"] .stMarkdown li {
+        color: #0e1117 !important;
     }
     
-    /* Footer styling */
+    /* Dark mode styles - light text */
+    [data-theme="dark"] .insight-box,
+    [data-theme="dark"] .stMarkdown p,
+    [data-theme="dark"] .stMarkdown li {
+        color: #fafafa !important;
+    }
+    
+    /* Fallback for elements that don't get data-theme correctly */
+    @media (prefers-color-scheme: dark) {
+        /* When system is in dark mode */
+        .insight-box:not([data-theme]),
+        .stMarkdown p:not([data-theme]),
+        .stMarkdown li:not([data-theme]) {
+            color: #fafafa !important;
+        }
+    }
+    
+    @media (prefers-color-scheme: light) {
+        /* When system is in light mode */
+        .insight-box:not([data-theme]),
+        .stMarkdown p:not([data-theme]),
+        .stMarkdown li:not([data-theme]) {
+            color: #0e1117 !important;
+        }
+    }
+    
+    /* Alternate styling with contrasting border */
+    .insight-box {
+        position: relative;
+    }
+    
+    .insight-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 0.3rem;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    /* Footer with adaptive styling */
     .footer {
         text-align: center;
-        color: #333333 !important; /* Darker color for better light mode visibility */
     }
     
-    /* Plotly-specific styles */
-    .js-plotly-plot .plotly .gtitle, 
-    .js-plotly-plot .plotly .xtitle,
-    .js-plotly-plot .plotly .ytitle {
-        fill: #333333 !important; /* Darker color for better light mode visibility */
+    [data-theme="light"] .footer {
+        color: #0e1117 !important;
     }
     
-    .js-plotly-plot .plotly .xtick text,
-    .js-plotly-plot .plotly .ytick text {
-        fill: #333333 !important; /* Darker color for better light mode visibility */
-    }
-
-    /* Streamlit caption and text elements */
-    .caption {
-        color: #333333 !important;
-    }
-    
-    p {
-        color: #333333 !important;
-    }
-    
-    li {
-        color: #333333 !important;
+    [data-theme="dark"] .footer {
+        color: #fafafa !important;
     }
 </style>
 """, unsafe_allow_html=True)
