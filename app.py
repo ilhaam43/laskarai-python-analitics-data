@@ -383,7 +383,7 @@ with tab2:
         # Hourly distribution of user types on weekends vs working days
         st.markdown('<div class="subsection-header">User Types Throughout the Day</div>', unsafe_allow_html=True)
         
-        user_hr_type = filtered_hour_df.groupby(['hr', 'workingday_name', 'user_type']).agg({
+        user_hr_type = filtered_hour_df.groupby(['hr', 'workingday_name']).agg({
             'casual': 'mean',
             'registered': 'mean'
         }).reset_index()
@@ -425,7 +425,7 @@ with tab2:
         
         st.plotly_chart(fig, use_container_width=True)
     
-    st.markdown('<div class="insight-box">Registered users dominate on working days, particularly during peak commuting hours, while casual users make up a significantly larger proportion of weekend and holiday rentals. On holidays, there's a notable decrease in registered users compared to regular weekends, suggesting many registered commuters may be away or not using the service.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="insight-box">Registered users dominate on working days, particularly during peak commuting hours, while casual users make up a significantly larger proportion of weekend and holiday rentals. On holidays, theres a notable decrease in registered users compared to regular weekends, suggesting many registered commuters may be away or not using the service.</div>', unsafe_allow_html=True)
 
 # Tab 3: Combined Analysis
 with tab3:
